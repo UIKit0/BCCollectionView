@@ -69,6 +69,8 @@ enum {
 
 //magnifiy events. This method is required BCCollectionView+Zoom is included
 - (NSRange)validScalingRangeForCollectionView:(BCCollectionView *)collectionView;
+- (float)magnificationVelocityForCollectionView:(BCCollectionView *)collectionView; // determines how fast the view should zoom while using the pinch gesture. Can vary depending on how large your validScalingRange is. In my app I have a range of 0..100 and use a magnificationVelocity of (scalingRange.length - scalingRange.location)/2
+
 - (void)colectionViewDidZoom:(BCCollectionView *)collectionView;
 
 //contextual menu

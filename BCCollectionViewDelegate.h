@@ -43,6 +43,7 @@ enum {
 //defaults to YES
 - (BOOL)collectionViewShouldDrawSelections:(BCCollectionView *)collectionView;
 - (BOOL)collectionViewShouldDrawHover:(BCCollectionView *)collectionView;
+- (BOOL)collectionViewShouldDrawSelectionRect:(BCCollectionView *)collectionView;
 
 //working with groups
 - (NSUInteger)groupHeaderHeightForCollectionView:(BCCollectionView *)collectionView;

@@ -88,6 +88,14 @@
     return YES;
 }
 
+- (BOOL)shouldDrawSelectionRect
+{
+    if ([delegate respondsToSelector:@selector(collectionViewShouldDrawSelectionRect:)])
+        return [delegate collectionViewShouldDrawSelectionRect:self];
+    else
+        return YES;
+}
+
 - (void)drawItemSelectionForInRect:(NSRect)aRect
 {
   NSRect insetRect = NSInsetRect(aRect, 10, 10);
@@ -101,9 +109,12 @@
 {
   [backgroundColor ? backgroundColor : [NSColor whiteColor] set];
   NSRectFill(dirtyRect);
+
+    if ([self shouldDrawSelectionRect]) {
+        [[NSColor grayColor] set];
+        NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
+    }
   
-  [[NSColor grayColor] set];
-  NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
   
   if ([selectionIndexes count] > 0 && [self shoulDrawSelections]) {
     for (NSNumber *number in visibleViewControllers)

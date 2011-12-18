@@ -63,17 +63,6 @@
   for (BCCollectionViewGroup *group in groups)
     [group removeObserver:self forKeyPath:@"isCollapsed"];
   
-  [layoutManager release];
-  [reusableViewControllers release];
-  [visibleViewControllers release];
-  [visibleGroupViewControllers release];
-  [contentArray release];
-  [groups release];
-  [selectionIndexes release];
-  [originalSelectionIndexes release];
-  [accumulatedKeyStrokes release];
-  [zoomValueObserverKey release];
-  [super dealloc];
 }
 
 - (BOOL)isFlipped
@@ -272,7 +261,7 @@
 - (NSViewController *)emptyViewControllerForInsertion
 {
   if ([reusableViewControllers count] > 0) {
-    NSViewController *viewController = [[[reusableViewControllers lastObject] retain] autorelease];
+    NSViewController *viewController = [reusableViewControllers lastObject];
     [reusableViewControllers removeLastObject];
     return viewController;
   } else

@@ -12,7 +12,7 @@
   
   NSArray *itemLayouts;
 }
-@property (retain) NSArray *itemLayouts;
+@property (strong) NSArray *itemLayouts;
 - (id)initWithCollectionView:(BCCollectionView *)collectionView; //assigned
 - (void)cancelItemEnumerator;
 - (void)enumerateItems:(BCCollectionViewLayoutOperationIterator)itemIterator completionBlock:(dispatch_block_t)completionBlock;

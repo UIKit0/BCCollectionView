@@ -95,11 +95,4 @@
   }
 }
 
-- (void)dealloc
-{
-  [layoutCallBack release];
-  [layoutCompletionBlock release];
-  [super dealloc];
-}
-
 @end

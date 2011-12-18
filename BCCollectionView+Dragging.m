@@ -14,7 +14,7 @@
   NSRect itemRect     = [layoutManager rectOfItemAtIndex:index];
   NSView *currentView = [[self viewControllerForItemAtIndex:index] view];
   NSData *imageData   = [currentView dataWithPDFInsideRect:NSMakeRect(0,0,NSWidth(itemRect),NSHeight(itemRect))];
-  NSImage *pdfImage   = [[[NSImage alloc] initWithData:imageData] autorelease];
+  NSImage *pdfImage   = [[NSImage alloc] initWithData:imageData];
   NSImage *dragImage  = [[NSImage alloc] initWithSize:[pdfImage size]];
   
   if ([dragImage size].width > 0 && [dragImage size].height > 0) {
@@ -25,8 +25,7 @@
   
   NSPasteboard *pasteboard = [NSPasteboard pasteboardWithName:NSDragPboard];
   [self delegateWriteIndexes:selectionIndexes toPasteboard:pasteboard];
-  [self retain];
-  [self dragImage:[dragImage autorelease]
+  [self dragImage:dragImage
                at:NSMakePoint(NSMinX(itemRect), NSMaxY(itemRect))
            offset:NSMakeSize(0, 0)
             event:anEvent
@@ -37,12 +36,10 @@
 
 - (void)draggedImage:(NSImage *)anImage beganAt:(NSPoint)aPoint
 {
-  [self retain];
 }
 
 - (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
 {
-  [self autorelease];
 }
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender

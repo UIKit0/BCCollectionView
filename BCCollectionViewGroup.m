@@ -2,7 +2,6 @@
 //  Copyright 2011 Bohemian Coding. All rights reserved.
 
 #import "BCCollectionViewGroup.h"
-#import "CHUserDefaults.h"
 
 @implementation BCCollectionViewGroup
 @synthesize title, itemRange;
@@ -13,18 +12,12 @@
   BCCollectionViewGroup *group = [[BCCollectionViewGroup alloc] init];
   [group setTitle:title];
   [group setItemRange:range];
-  return [group autorelease];
+  return group;
 }
 
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"%@ %@", title, NSStringFromRange(itemRange)];
-}
-
-- (void)dealloc
-{
-  [title release];
-  [super dealloc];
 }
 
 - (NSString *)defaultsIdentifier
@@ -34,12 +27,14 @@
 
 - (BOOL)isCollapsed
 {
-  return CHDefaultsBoolForKey([self defaultsIdentifier]);
+  return [[NSUserDefaults standardUserDefaults] boolForKey:[self defaultsIdentifier]];
 }
 
 - (void)setIsCollapsed:(BOOL)isCollapsed
 {
-  CHDefaultsSetBoolForKey(isCollapsed, [self defaultsIdentifier]);
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    [ud setBool:isCollapsed forKey:[self defaultsIdentifier]];
+    [ud synchronize];
 }
 
 @end

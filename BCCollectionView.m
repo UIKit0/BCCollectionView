@@ -90,10 +90,10 @@
 
 - (BOOL)shouldDrawSelectionRect
 {
-    if ([delegate respondsToSelector:@selector(collectionViewShouldDrawSelectionRect:)])
-        return [delegate collectionViewShouldDrawSelectionRect:self];
-    else
-        return YES;
+  if ([delegate respondsToSelector:@selector(collectionViewShouldDrawSelectionRect:)])
+    return [delegate collectionViewShouldDrawSelectionRect:self];
+  else
+    return YES;
 }
 
 - (void)drawItemSelectionForInRect:(NSRect)aRect
@@ -108,14 +108,23 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
   [backgroundColor ? backgroundColor : [NSColor whiteColor] set];
-  NSRectFill(dirtyRect);
+  if ([backgroundColor patternImage]) {
+    // when filling with pattern, we want to keep the pattern anchored at top-left
+    [NSGraphicsContext saveGraphicsState];
+    CGFloat yOffset = NSMaxY([self convertRect:self.bounds toView:nil]);
+    CGFloat xOffset = NSMinX([self convertRect:self.bounds toView:nil]);
+    [[NSGraphicsContext currentContext] setPatternPhase:NSMakePoint(xOffset, yOffset)];
+    NSRectFill(dirtyRect);
+    [NSGraphicsContext restoreGraphicsState];
+  }
+  else
+    NSRectFill(dirtyRect);
 
-    if ([self shouldDrawSelectionRect]) {
-        [[NSColor grayColor] set];
-        NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
-    }
-  
-  
+  if ([self shouldDrawSelectionRect]) {
+    [[NSColor grayColor] set];
+    NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
+  }
+
   if ([selectionIndexes count] > 0 && [self shoulDrawSelections]) {
     for (NSNumber *number in visibleViewControllers)
       if ([selectionIndexes containsIndex:[number integerValue]])

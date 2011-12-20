@@ -220,7 +220,7 @@
   NSRange range = [self rangeOfVisibleItems];
   NSInteger extraItems = [layoutManager maximumNumberOfItemsPerRow] * numberOfPreRenderedRows;
   NSInteger min = range.location;
-  NSInteger max = range.location + range.length;
+  NSUInteger max = range.location + range.length;
   
   min = MAX(0, min-extraItems);
   max = MIN([contentArray count], max+extraItems);

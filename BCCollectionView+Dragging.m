@@ -108,7 +108,7 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
   id item = nil;
-  if (dragHoverIndex >= 0 && dragHoverIndex <[contentArray count])
+  if (dragHoverIndex <[contentArray count])
     item = [contentArray objectAtIndex:dragHoverIndex];
   
   if ([delegate respondsToSelector:@selector(collectionView:performDragOperation:onViewController:forItem:)])
@@ -120,7 +120,7 @@
 #pragma mark -
 #pragma mark Delegate Shortcuts
 
-- (void)setDragHoverIndex:(NSInteger)hoverIndex
+- (void)setDragHoverIndex:(NSUInteger)hoverIndex
 {
   if (hoverIndex != dragHoverIndex) {
     if (dragHoverIndex != NSNotFound)

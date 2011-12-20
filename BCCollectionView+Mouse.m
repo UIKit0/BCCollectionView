@@ -8,6 +8,9 @@
 
 @implementation BCCollectionView (BCCollectionView_Mouse)
 
+BOOL isDragging;
+BOOL firstDrag;
+
 - (BOOL)shiftOrCommandKeyPressed
 {
   return [NSEvent modifierFlags] & NSShiftKeyMask || [NSEvent modifierFlags] & NSCommandKeyMask;

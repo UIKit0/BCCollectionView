@@ -5,10 +5,12 @@
 
 @interface BCCollectionViewLayoutItem : NSObject
 {
-  NSInteger rowIndex, columnIndex, itemIndex;
+  NSInteger itemIndex;
+  NSUInteger rowIndex, columnIndex;
   NSRect itemRect, itemContentRect;
 }
-@property (nonatomic) NSInteger rowIndex, columnIndex, itemIndex;
+@property (nonatomic) NSInteger itemIndex;
+@property (nonatomic) NSUInteger rowIndex, columnIndex;
 @property (nonatomic) NSRect itemRect, itemContentRect;
 + (id)layoutItem;
 @end

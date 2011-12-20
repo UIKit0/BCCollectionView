@@ -11,6 +11,8 @@
 
 @implementation BCCollectionView (BCCollectionView_Zoom)
 
+CGFloat lastPinchMagnification;
+
 - (void)registerForZoomValueChangesInDefaultsForKey:(NSString *)key
 {
   self.zoomValueObserverKey = key;
@@ -55,7 +57,8 @@
   zoomValue = zoomValue * (magnification+1);
   
   NSRange scalingRange = [delegate validScalingRangeForCollectionView:self];
-  zoomValue = MAX(MIN(zoomValue, scalingRange.location + scalingRange.length), scalingRange.location);
+  CGFloat zoomValueMin = MIN(zoomValue, scalingRange.location + scalingRange.length);
+  zoomValue = MAX(zoomValueMin, scalingRange.location);
   [[NSUserDefaults standardUserDefaults] setInteger:zoomValue forKey:zoomValueObserverKey];
   
   [self zoomValueDidChange];

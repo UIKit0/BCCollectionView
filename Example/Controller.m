@@ -93,7 +93,7 @@
 //Return an empty ViewController, this might not be visible to the user immediately
 - (NSViewController *)reusableViewControllerForCollectionView:(BCCollectionView *)collectionView
 {
-	return [[[CellViewController alloc] init] autorelease];
+	return [[CellViewController alloc] init];
 }
 
 //The CollectionView is about to display the ViewController. Use this method to populate the ViewController with data

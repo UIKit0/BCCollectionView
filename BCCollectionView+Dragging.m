@@ -4,6 +4,13 @@
 #import "BCCollectionView+Dragging.h"
 #import "BCCollectionViewLayoutManager.h"
 
+@interface BCCollectionView ()
+{
+	BOOL firstDrag;
+}
+
+@end
+
 @implementation BCCollectionView (BCCollectionView_Dragging)
 
 - (void)initiateDraggingSessionWithEvent:(NSEvent *)anEvent

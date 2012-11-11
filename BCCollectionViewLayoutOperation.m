@@ -15,16 +15,26 @@
   if ([self isCancelled])
     return;
   
-  NSInteger numberOfRows = 0;
+  NSUInteger numberOfRows = 0;
+  NSInteger startingX = 0;
+  NSInteger x = 0;
   NSInteger y = 0;
   NSUInteger colIndex   = 0;
   NSRect visibleRect    = [collectionView visibleRect];
   NSSize cellSize       = [collectionView cellSize];
   NSSize inset          = NSZeroSize;
   NSInteger maxColumns  = [[collectionView layoutManager] maximumNumberOfItemsPerRow];
-  NSUInteger gap        = (NSWidth([collectionView frame]) - maxColumns*cellSize.width)/(maxColumns+1);
-  NSInteger startingX = gap;
-  NSInteger x = gap;
+  NSUInteger gap        = 0;
+	
+  if (maxColumns == 1)
+    gap = NSWidth([collectionView frame]) - cellSize.width;
+  else
+    gap = (NSWidth([collectionView frame]) - maxColumns*cellSize.width)/(maxColumns-1);
+  if (maxColumns < 4 && maxColumns > 1) {
+    gap = (NSWidth([collectionView frame]) - maxColumns*cellSize.width)/(maxColumns+1);
+    startingX = gap;
+    x = gap;
+  }
   
   if ([[collectionView delegate] respondsToSelector:@selector(insetMarginForSelectingItemsInCollectionView:)])
     inset = [[collectionView delegate] insetMarginForSelectingItemsInCollectionView:collectionView];
@@ -37,7 +47,7 @@
     y += [[collectionView delegate] topOffsetForItemsInCollectionView:collectionView];
   
   NSUInteger count = [[collectionView contentArray] count];
-  for (NSInteger i=0; i<count; i++) {
+  for (NSUInteger i=0; i<count; i++) {
     if ([self isCancelled])
       return;
     

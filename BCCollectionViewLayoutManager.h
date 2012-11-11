@@ -19,6 +19,7 @@
 
 #pragma mark Primitives
 - (NSUInteger)maximumNumberOfItemsPerRow;
+- (NSUInteger)numberOfRows;
 - (NSSize)cellSize;
 
 #pragma mark Rows and Columns

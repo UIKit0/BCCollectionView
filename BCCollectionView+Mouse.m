@@ -23,7 +23,7 @@
   NSUInteger index     = [layoutManager indexOfItemContentRectAtPoint:mouseDownLocation];
   
   if (index != NSNotFound && [delegate respondsToSelector:@selector(collectionView:didClickItem:withViewController:)])
-    [delegate collectionView:self didClickItem:[contentArray objectAtIndex:index] withViewController:[visibleViewControllers objectForKey:[NSNumber numberWithInt:index]]];
+    [delegate collectionView:self didClickItem:[contentArray objectAtIndex:index] withViewController:[visibleViewControllers objectForKey:[NSNumber numberWithInteger:index]]];
   
   if (![self shiftOrCommandKeyPressed] && ![selectionIndexes containsIndex:index])
     [self deselectAllItems];
@@ -31,7 +31,7 @@
   self.originalSelectionIndexes = [[selectionIndexes copy] autorelease];
   
   if ([theEvent type] == NSLeftMouseDown && [theEvent clickCount] == 2 && [delegate respondsToSelector:@selector(collectionView:didDoubleClickViewControllerAtIndex:)])
-    [delegate collectionView:self didDoubleClickViewControllerAtIndex:[visibleViewControllers objectForKey:[NSNumber numberWithInt:index]]];
+    [delegate collectionView:self didDoubleClickViewControllerAtIndex:[visibleViewControllers objectForKey:[NSNumber numberWithInteger:index]]];
   
   if ([self shiftOrCommandKeyPressed] && [self.originalSelectionIndexes containsIndex:index])
     [self deselectItemAtIndex:index];

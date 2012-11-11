@@ -97,7 +97,7 @@
 }
 
 //The CollectionView is about to display the ViewController. Use this method to populate the ViewController with data
-- (void)collectionView:(BCCollectionView *)collectionView willShowViewController:(NSViewController *)viewController forItem:(id)anItem
+- (void)collectionView:(BCCollectionView *)collectionView willShowViewController:(NSViewController *)viewController forItem:(id)anItem atIndex:(NSUInteger)anIndex
 {
 	CellViewController *cell = (CellViewController*)viewController;
 	[cell.imageView setImage:anItem];

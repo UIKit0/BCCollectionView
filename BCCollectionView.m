@@ -452,7 +452,7 @@
 
 - (void)deselectAllItems
 {
-  [self deselectItemsAtIndexes:selectionIndexes];
+  [self deselectItemsAtIndexes:[selectionIndexes copy]];
 }
 
 - (NSIndexSet *)selectionIndexes

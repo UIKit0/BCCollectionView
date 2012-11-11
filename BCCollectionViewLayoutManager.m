@@ -34,15 +34,9 @@
   
 // if ([queue operationCount] > 10)
     [queue cancelAllOperations];
-  [queue addOperation:[operation autorelease]];
+  [queue addOperation:operation];
 }
 
-- (void)dealloc
-{
-  [itemLayouts release];
-  [queue release];
-  [super dealloc];
-}
 
 #pragma mark -
 #pragma mark Primitives

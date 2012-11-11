@@ -76,24 +76,12 @@
 	if (zoomValueObserverKey !=	nil)
 		[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:zoomValueObserverKey];
 
-	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-	[center removeObserver:self name:NSViewBoundsDidChangeNotification object:[[self enclosingScrollView] contentView]];
-	[center removeObserver:self name:NSViewFrameDidChangeNotification object:self];
-
-	for (BCCollectionViewGroup *group in groups)
-		[group removeObserver:self forKeyPath:@"isCollapsed"];
-
-	[layoutManager release];
-	[reusableViewControllers release];
-	[visibleViewControllers release];
-	[visibleGroupViewControllers release];
-	[contentArray release];
-	[groups release];
-	[selectionIndexes release];
-	[originalSelectionIndexes release];
-	[accumulatedKeyStrokes release];
-	[zoomValueObserverKey release];
-	[super dealloc];
+  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+  [center removeObserver:self name:NSViewBoundsDidChangeNotification object:[[self enclosingScrollView] contentView]];
+  [center removeObserver:self name:NSViewFrameDidChangeNotification object:self];
+  
+  for (BCCollectionViewGroup *group in groups)
+    [group removeObserver:self forKeyPath:@"isCollapsed"];
 }
 
 - (BOOL)isFlipped
@@ -119,6 +107,14 @@
     return YES;
 }
 
+- (BOOL)shouldDrawSelectionRect
+{
+  if ([delegate respondsToSelector:@selector(collectionViewShouldDrawSelectionRect:)])
+    return [delegate collectionViewShouldDrawSelectionRect:self];
+  else
+    return YES;
+}
+
 - (void)drawItemSelectionForInRect:(NSRect)aRect
 {
   NSRect insetRect = NSInsetRect(aRect, 10, 10);
@@ -131,11 +127,23 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
   [backgroundColor ? backgroundColor : [NSColor whiteColor] set];
-  NSRectFill(dirtyRect);
-  
-  [[NSColor grayColor] set];
-  NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
-  
+  if ([backgroundColor patternImage]) {
+    // when filling with pattern, we want to keep the pattern anchored at top-left
+    [NSGraphicsContext saveGraphicsState];
+    CGFloat yOffset = NSMaxY([self convertRect:self.bounds toView:nil]);
+    CGFloat xOffset = NSMinX([self convertRect:self.bounds toView:nil]);
+    [[NSGraphicsContext currentContext] setPatternPhase:NSMakePoint(xOffset, yOffset)];
+    NSRectFill(dirtyRect);
+    [NSGraphicsContext restoreGraphicsState];
+  }
+  else
+    NSRectFill(dirtyRect);
+
+  if ([self shouldDrawSelectionRect]) {
+    [[NSColor grayColor] set];
+    NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
+  }
+
   if ([selectionIndexes count] > 0 && [self shoulDrawSelections]) {
     for (NSNumber *number in visibleViewControllers)
       if ([selectionIndexes containsIndex:[number integerValue]])
@@ -301,7 +309,7 @@
 - (NSViewController *)emptyViewControllerForInsertion
 {
   if ([reusableViewControllers count] > 0) {
-    NSViewController *viewController = [[[reusableViewControllers lastObject] retain] autorelease];
+    NSViewController *viewController = [reusableViewControllers lastObject];
     [reusableViewControllers removeLastObject];
     return viewController;
   } else

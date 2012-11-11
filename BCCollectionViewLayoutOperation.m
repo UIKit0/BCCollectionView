@@ -85,23 +85,15 @@
         layoutCallBack(item);
       });
     }
-    if ([group itemRange].location + [group itemRange].length-1 == i)
+    if (group && ([group itemRange].location + [group itemRange].length-1 == i))
       group = [groupEnum nextObject];
   }
-  
   if (![self isCancelled]) {
     dispatch_async(dispatch_get_main_queue(), ^{
       [[collectionView layoutManager] setItemLayouts:newLayouts];
       layoutCompletionBlock();
     });
   }
-}
-
-- (void)dealloc
-{
-  [layoutCallBack release];
-  [layoutCompletionBlock release];
-  [super dealloc];
 }
 
 @end

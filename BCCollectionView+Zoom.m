@@ -11,6 +11,8 @@
 
 @implementation BCCollectionView (BCCollectionView_Zoom)
 
+CGFloat lastPinchMagnification;
+
 - (void)registerForZoomValueChangesInDefaultsForKey:(NSString *)key
 {
   self.zoomValueObserverKey = key;

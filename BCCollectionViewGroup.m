@@ -12,18 +12,12 @@
   BCCollectionViewGroup *group = [[BCCollectionViewGroup alloc] init];
   [group setTitle:title];
   [group setItemRange:range];
-  return [group autorelease];
+  return group;
 }
 
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"%@ %@", title, NSStringFromRange(itemRange)];
-}
-
-- (void)dealloc
-{
-  [title release];
-  [super dealloc];
 }
 
 - (NSString *)defaultsIdentifier

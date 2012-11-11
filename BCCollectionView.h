@@ -38,12 +38,13 @@
   BOOL selectionChangedDisabled;
   
   CGFloat lastPinchMagnification;
+
   NSString *zoomValueObserverKey;
   
   NSString *accumulatedKeyStrokes;
 }
-@property (nonatomic, assign) __unsafe_unretained id<BCCollectionViewDelegate> delegate;
-@property (nonatomic, retain) NSColor *backgroundColor;
+@property (nonatomic, unsafe_unretained) id<BCCollectionViewDelegate> delegate;
+@property (nonatomic, strong) NSColor *backgroundColor;
 @property (nonatomic) NSUInteger numberOfPreRenderedRows;
 
 //private
@@ -51,7 +52,7 @@
 @property (nonatomic, copy) NSArray *contentArray, *groups;
 @property (nonatomic, copy) NSString *zoomValueObserverKey, *accumulatedKeyStrokes;
 
-@property (readonly) NSArray *visibleViewControllerArray;
+@property (unsafe_unretained, readonly) NSArray *visibleViewControllerArray;
 @property (readonly) BCCollectionViewLayoutManager *layoutManager;
 
 //designated way to load BCCollectionView

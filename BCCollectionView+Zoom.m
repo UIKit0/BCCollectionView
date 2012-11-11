@@ -51,12 +51,14 @@
   
   CGFloat magnification = [event type] == NSEventTypeMagnify ? [event magnification] : lastPinchMagnification;
   
-  CGFloat zoomValue = [[NSUserDefaults standardUserDefaults] integerForKey:zoomValueObserverKey];
-  zoomValue = zoomValue * (magnification+1);
+  CGFloat zoomValue = [[NSUserDefaults standardUserDefaults] floatForKey:zoomValueObserverKey];
   
   NSRange scalingRange = [delegate validScalingRangeForCollectionView:self];
+  float magnificationVelocity = [delegate magnificationVelocityForCollectionView:self];
+  
+  zoomValue = zoomValue + (magnification * magnificationVelocity);
   zoomValue = MAX(MIN(zoomValue, scalingRange.location + scalingRange.length), scalingRange.location);
-  [[NSUserDefaults standardUserDefaults] setInteger:zoomValue forKey:zoomValueObserverKey];
+  [[NSUserDefaults standardUserDefaults] setFloat:zoomValue forKey:zoomValueObserverKey];
   
   [self zoomValueDidChange];
   [[[self enclosingScrollView] contentView] autoscroll:event];

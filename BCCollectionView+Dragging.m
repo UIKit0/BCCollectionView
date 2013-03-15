@@ -15,21 +15,39 @@
 
 - (void)initiateDraggingSessionWithEvent:(NSEvent *)anEvent
 {
-  NSUInteger index = [layoutManager indexOfItemAtPoint:mouseDownLocation];
-  [self selectItemAtIndex:index];
-  
-  NSRect itemRect     = [layoutManager rectOfItemAtIndex:index];
-  NSView *currentView = [[self viewControllerForItemAtIndex:index] view];
-  NSData *imageData   = [currentView dataWithPDFInsideRect:NSMakeRect(0,0,NSWidth(itemRect),NSHeight(itemRect))];
-  NSImage *pdfImage   = [[NSImage alloc] initWithData:imageData];
-  NSImage *dragImage  = [[NSImage alloc] initWithSize:[pdfImage size]];
-  
-  if ([dragImage size].width > 0 && [dragImage size].height > 0) {
-    [dragImage lockFocus];
-    [pdfImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:0.5];
-    [dragImage unlockFocus];
-  }
-  
+
+    // we see if we can get a dragged image from our delegate
+    NSIndexSet *indexes = nil;
+    if ([self selectionIndexes])
+        indexes = [self selectionIndexes];
+    else {
+        NSUInteger index = [layoutManager indexOfItemAtPoint:mouseDownLocation];
+        indexes = [NSIndexSet indexSetWithIndex:index];
+    }
+    NSImage *dragImage;
+    NSRect itemRect;
+    if ([delegate respondsToSelector:@selector(collectionView:dragImageForItemsAtIndexes:)]) {
+        dragImage = [delegate collectionView:self dragImageForItemsAtIndexes:indexes];
+        NSUInteger index = [layoutManager indexOfItemAtPoint:mouseDownLocation];
+        itemRect     = [layoutManager rectOfItemAtIndex:index];
+    } else {
+        NSInteger index = [indexes firstIndex];
+        [self selectItemAtIndex:index];
+        
+        itemRect     = [layoutManager rectOfItemAtIndex:index];
+        NSView *currentView = [[self viewControllerForItemAtIndex:index] view];
+        NSData *imageData   = [currentView dataWithPDFInsideRect:NSMakeRect(0,0,NSWidth(itemRect),NSHeight(itemRect))];
+        NSImage *pdfImage   = [[NSImage alloc] initWithData:imageData];
+        NSImage *dragImage  = [[NSImage alloc] initWithSize:[pdfImage size]];
+        
+        if ([dragImage size].width > 0 && [dragImage size].height > 0) {
+            [dragImage lockFocus];
+            [pdfImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:0.5];
+            [dragImage unlockFocus];
+        }
+    }
+
+    
   NSPasteboard *pasteboard = [NSPasteboard pasteboardWithName:NSDragPboard];
   [self delegateWriteIndexes:selectionIndexes toPasteboard:pasteboard];
   [self dragImage:dragImage

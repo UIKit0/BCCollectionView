@@ -53,6 +53,7 @@ enum {
 //managing Drag & Drop (in order of occurence)
 - (BOOL)collectionView:(BCCollectionView *)collectionView canDragItemsAtIndexes:(NSIndexSet *)indexSet;
 - (void)collectionView:(BCCollectionView *)collectionView writeItemsAtIndexes:(NSIndexSet *)indexSet toPasteboard:(NSPasteboard *)pboard;
+- (NSImage*)collectionView:(BCCollectionView *)collectionView dragImageForItemsAtIndexes:(NSIndexSet*)indexSet;
 - (BOOL)collectionView:(BCCollectionView *)collectionView validateDrop:(id <NSDraggingInfo>)draggingInfo onItemAtIndex:(NSInteger)index;
 - (void)collectionView:(BCCollectionView *)collectionView dragEnteredViewController:(NSViewController *)viewController;
 - (void)collectionView:(BCCollectionView *)collectionView dragExitedViewController:(NSViewController *)viewController;

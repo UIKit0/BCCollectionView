@@ -64,6 +64,9 @@ enum {
 - (NSDragOperation)collectionView:(BCCollectionView *)collectionView draggingEntered:(id <NSDraggingInfo>)draggingInfo;
 - (void)collectionView:(BCCollectionView *)collectionView draggingEnded:(id <NSDraggingInfo>)draggingInfo;
 - (void)collectionView:(BCCollectionView *)collectionView draggingExited:(id <NSDraggingInfo>)draggingInfo;
+- (NSData*)collectionView:(BCCollectionView *)collectionView dragDataForItemsAtIndexes:(NSIndexSet*)indexes;
+- (NSArray*)collectionView:(BCCollectionView *)collectionView filenamesForItemsAtIndexes:(NSIndexSet*)indexes;
+- (BOOL)collectionView:(BCCollectionView *)collectionView dragFilePromisesWithDataType:(NSString**)dataType;
 
 //key events
 - (void)collectionView:(BCCollectionView *)collectionView deleteItemsAtIndexes:(NSIndexSet *)indexSet;

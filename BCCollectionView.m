@@ -57,9 +57,17 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-  if ([keyPath isEqualToString:@"backgroundColor"])
+    if ([keyPath isEqualToString:@"backgroundColor"]) {
+    // if we get a pattern image exception, set it to white
+      /*@try {
+          [[self backgroundColor] patternImage];
+      }
+    @catch (NSException *exception) {
+        ELog(@"Pattern Image Exception");
+        backgroundColor = [NSColor whiteColor];
+    }*/
     [self setNeedsDisplay:YES];
-  else if ([keyPath isEqual:zoomValueObserverKey]) {
+    } else if ([keyPath isEqual:zoomValueObserverKey]) {
     if ([self respondsToSelector:@selector(zoomValueDidChange)])
       [self performSelector:@selector(zoomValueDidChange)];
   } else if ([keyPath isEqualToString:@"isCollapsed"]) {
@@ -127,7 +135,7 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
   [backgroundColor ? backgroundColor : [NSColor whiteColor] set];
-  if ([backgroundColor patternImage]) {
+  /*if ([[backgroundColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace] patternImage]) {
     // when filling with pattern, we want to keep the pattern anchored at top-left
     [NSGraphicsContext saveGraphicsState];
     CGFloat yOffset = NSMaxY([self convertRect:self.bounds toView:nil]);
@@ -136,7 +144,7 @@
     NSRectFill(dirtyRect);
     [NSGraphicsContext restoreGraphicsState];
   }
-  else
+  else*/
     NSRectFill(dirtyRect);
 
   if ([self shouldDrawSelectionRect]) {

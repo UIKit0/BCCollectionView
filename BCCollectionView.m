@@ -57,17 +57,9 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if ([keyPath isEqualToString:@"backgroundColor"]) {
-    // if we get a pattern image exception, set it to white
-      /*@try {
-          [[self backgroundColor] patternImage];
-      }
-    @catch (NSException *exception) {
-        ELog(@"Pattern Image Exception");
-        backgroundColor = [NSColor whiteColor];
-    }*/
+  if ([keyPath isEqualToString:@"backgroundColor"])
     [self setNeedsDisplay:YES];
-    } else if ([keyPath isEqual:zoomValueObserverKey]) {
+  else if ([keyPath isEqual:zoomValueObserverKey]) {
     if ([self respondsToSelector:@selector(zoomValueDidChange)])
       [self performSelector:@selector(zoomValueDidChange)];
   } else if ([keyPath isEqualToString:@"isCollapsed"]) {
@@ -135,16 +127,6 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
   [backgroundColor ? backgroundColor : [NSColor whiteColor] set];
-  /*if ([[backgroundColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace] patternImage]) {
-    // when filling with pattern, we want to keep the pattern anchored at top-left
-    [NSGraphicsContext saveGraphicsState];
-    CGFloat yOffset = NSMaxY([self convertRect:self.bounds toView:nil]);
-    CGFloat xOffset = NSMinX([self convertRect:self.bounds toView:nil]);
-    [[NSGraphicsContext currentContext] setPatternPhase:NSMakePoint(xOffset, yOffset)];
-    NSRectFill(dirtyRect);
-    [NSGraphicsContext restoreGraphicsState];
-  }
-  else*/
     NSRectFill(dirtyRect);
 
   if ([self shouldDrawSelectionRect]) {
@@ -369,15 +351,12 @@
 
 - (void)addMissingViewControllersToView
 {
-  dispatch_async(dispatch_get_main_queue(), ^{
-//	  NSLog(@"addMisingViewControllersToView dispatch");
     [[NSIndexSet indexSetWithIndexesInRange:[self rangeOfVisibleItemsWithOverflow]] enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
       if (![visibleViewControllers objectForKey:[NSNumber numberWithInteger:idx]]) {
         [self addMissingViewControllerForItemAtIndex:idx withFrame:[layoutManager rectOfItemAtIndex:idx]];
       }
     }];
     [self addMissingGroupHeaders];
-  });
 }
 
 - (void)moveViewControllersToProperPosition
@@ -590,16 +569,11 @@
 {
 	if ([[self indexesOfInvisibleViewControllers] count] > 0)
 	{
-	  dispatch_async(dispatch_get_main_queue(), ^{
-//		  NSLog(@"scrollViewDidScroll dispatch");
 		[self removeInvisibleViewControllers];
-	  });
 	}
 	if ([[self indexesOfMissingViewControllers] count] > 0)
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
 			[self addMissingViewControllersToView];
-		});
 	}
   if ([delegate respondsToSelector:@selector(collectionViewDidScroll:inDirection:)]) {
     if ([self visibleRect].origin.y > previousFrameBounds.origin.y)

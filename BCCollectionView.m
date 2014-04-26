@@ -11,6 +11,7 @@
 
 //Declare this here to avoid compiler warnings about undeclared selector
 - (void)zoomValueDidChange;
+- (void)configureView;
 
 @end
 
@@ -18,42 +19,43 @@
 @synthesize delegate, contentArray, groups, backgroundColor, originalSelectionIndexes, zoomValueObserverKey, accumulatedKeyStrokes, numberOfPreRenderedRows, layoutManager;
 @dynamic visibleViewControllerArray;
 
-- (void)bcCommonInit
+- (id)initWithFrame:(NSRect)frameRect
 {
-    reusableViewControllers     = [[NSMutableArray alloc] init];
-    visibleViewControllers      = [[NSMutableDictionary alloc] init];
-    contentArray                = [[NSArray alloc] init];
-    selectionIndexes            = [[NSMutableIndexSet alloc] init];
-    dragHoverIndex              = NSNotFound;
-    accumulatedKeyStrokes       = [[NSString alloc] init];
-    numberOfPreRenderedRows     = 3;
-    layoutManager               = [[BCCollectionViewLayoutManager alloc] initWithCollectionView:self];
-    visibleGroupViewControllers = [[NSMutableDictionary alloc] init];
-    
-    [self addObserver:self forKeyPath:@"backgroundColor" options:0 context:NULL];
-    
-    NSClipView *enclosingClipView = [[self enclosingScrollView] contentView];
-    [enclosingClipView setPostsBoundsChangedNotifications:YES];
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(scrollViewDidScroll:) name:NSViewBoundsDidChangeNotification object:enclosingClipView];
-    [center addObserver:self selector:@selector(viewDidResize:) name:NSViewFrameDidChangeNotification object:self];
+  self = [super initWithFrame:frameRect];
+  if (self) {
+    [self configureView];
+  }
+  return self;
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
   self = [super initWithCoder:aDecoder];
   if (self) {
-	  [self bcCommonInit];
+    [self configureView];
   }
   return self;
 }
 
-- (id)initWithFrame:(NSRect)frameRect
+- (void)configureView
 {
-	self = [super initWithFrame:frameRect];
-	if (self)
-		[self bcCommonInit];
-	return self;
+  reusableViewControllers     = [[NSMutableArray alloc] init];
+  visibleViewControllers      = [[NSMutableDictionary alloc] init];
+  contentArray                = [[NSArray alloc] init];
+  selectionIndexes            = [[NSMutableIndexSet alloc] init];
+  dragHoverIndex              = NSNotFound;
+  accumulatedKeyStrokes       = [[NSString alloc] init];
+  numberOfPreRenderedRows     = 3;
+  layoutManager               = [[BCCollectionViewLayoutManager alloc] initWithCollectionView:self];
+  visibleGroupViewControllers = [[NSMutableDictionary alloc] init];
+
+  [self addObserver:self forKeyPath:@"backgroundColor" options:0 context:NULL];
+
+  NSClipView *enclosingClipView = [[self enclosingScrollView] contentView];
+  [enclosingClipView setPostsBoundsChangedNotifications:YES];
+  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+  [center addObserver:self selector:@selector(scrollViewDidScroll:) name:NSViewBoundsDidChangeNotification object:enclosingClipView];
+  [center addObserver:self selector:@selector(viewDidResize:) name:NSViewFrameDidChangeNotification object:self];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -77,24 +79,12 @@
 	if (zoomValueObserverKey !=	nil)
 		[[NSUserDefaults standardUserDefaults] removeObserver:self forKeyPath:zoomValueObserverKey];
 
-	NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-	[center removeObserver:self name:NSViewBoundsDidChangeNotification object:[[self enclosingScrollView] contentView]];
-	[center removeObserver:self name:NSViewFrameDidChangeNotification object:self];
-
-	for (BCCollectionViewGroup *group in groups)
-		[group removeObserver:self forKeyPath:@"isCollapsed"];
-
-	[layoutManager release];
-	[reusableViewControllers release];
-	[visibleViewControllers release];
-	[visibleGroupViewControllers release];
-	[contentArray release];
-	[groups release];
-	[selectionIndexes release];
-	[originalSelectionIndexes release];
-	[accumulatedKeyStrokes release];
-	[zoomValueObserverKey release];
-	[super dealloc];
+  NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+  [center removeObserver:self name:NSViewBoundsDidChangeNotification object:[[self enclosingScrollView] contentView]];
+  [center removeObserver:self name:NSViewFrameDidChangeNotification object:self];
+  
+  for (BCCollectionViewGroup *group in groups)
+    [group removeObserver:self forKeyPath:@"isCollapsed"];
 }
 
 - (BOOL)isFlipped
@@ -120,6 +110,14 @@
     return YES;
 }
 
+- (BOOL)shouldDrawSelectionRect
+{
+  if ([delegate respondsToSelector:@selector(collectionViewShouldDrawSelectionRect:)])
+    return [delegate collectionViewShouldDrawSelectionRect:self];
+  else
+    return YES;
+}
+
 - (void)drawItemSelectionForInRect:(NSRect)aRect
 {
   NSRect insetRect = NSInsetRect(aRect, 10, 10);
@@ -132,11 +130,13 @@
 - (void)drawRect:(NSRect)dirtyRect
 {
   [backgroundColor ? backgroundColor : [NSColor whiteColor] set];
-  NSRectFill(dirtyRect);
-  
-  [[NSColor grayColor] set];
-  NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
-  
+    NSRectFill(dirtyRect);
+
+  if ([self shouldDrawSelectionRect]) {
+    [[NSColor grayColor] set];
+    NSFrameRect(BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation));
+  }
+
   if ([selectionIndexes count] > 0 && [self shoulDrawSelections]) {
     for (NSNumber *number in visibleViewControllers)
       if ([selectionIndexes containsIndex:[number integerValue]])
@@ -302,7 +302,7 @@
 - (NSViewController *)emptyViewControllerForInsertion
 {
   if ([reusableViewControllers count] > 0) {
-    NSViewController *viewController = [[[reusableViewControllers lastObject] retain] autorelease];
+    NSViewController *viewController = [reusableViewControllers lastObject];
     [reusableViewControllers removeLastObject];
     return viewController;
   } else
@@ -354,15 +354,12 @@
 
 - (void)addMissingViewControllersToView
 {
-  dispatch_async(dispatch_get_main_queue(), ^{
-//	  NSLog(@"addMisingViewControllersToView dispatch");
     [[NSIndexSet indexSetWithIndexesInRange:[self rangeOfVisibleItemsWithOverflow]] enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
       if (![visibleViewControllers objectForKey:[NSNumber numberWithInteger:idx]]) {
         [self addMissingViewControllerForItemAtIndex:idx withFrame:[layoutManager rectOfItemAtIndex:idx]];
       }
     }];
     [self addMissingGroupHeaders];
-  });
 }
 
 - (void)moveViewControllersToProperPosition
@@ -445,7 +442,7 @@
 
 - (void)deselectAllItems
 {
-  [self deselectItemsAtIndexes:selectionIndexes];
+  [self deselectItemsAtIndexes:[selectionIndexes copy]];
 }
 
 - (NSIndexSet *)selectionIndexes
@@ -575,16 +572,11 @@
 {
 	if ([[self indexesOfInvisibleViewControllers] count] > 0)
 	{
-	  dispatch_async(dispatch_get_main_queue(), ^{
-//		  NSLog(@"scrollViewDidScroll dispatch");
 		[self removeInvisibleViewControllers];
-	  });
 	}
 	if ([[self indexesOfMissingViewControllers] count] > 0)
 	{
-		dispatch_async(dispatch_get_main_queue(), ^{
 			[self addMissingViewControllersToView];
-		});
 	}
   if ([delegate respondsToSelector:@selector(collectionViewDidScroll:inDirection:)]) {
     if ([self visibleRect].origin.y > previousFrameBounds.origin.y)

@@ -77,7 +77,7 @@
 - (void)moveLeftAndModifySelection:(id)sender
 {
   if (lastSelectionIndex > 0) {
-    NSUInteger newIndex = MAX(0, lastSelectionIndex-1);
+    NSUInteger newIndex = MAX(0ul, lastSelectionIndex-1);
     [self simpleExtendSelectionRange:NSMakeRange(newIndex, 2) newIndex:newIndex];
   }
 }

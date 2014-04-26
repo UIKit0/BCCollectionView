@@ -10,5 +10,5 @@
 - (BOOL)delegateSupportsDragForItemsAtIndexes:(NSIndexSet *)indexSet;
 - (void)delegateWriteIndexes:(NSIndexSet *)indexSet toPasteboard:(NSPasteboard *)pasteboard;
 - (BOOL)delegateCanDrop:(id)draggingInfo onIndex:(NSUInteger)index;
-- (void)setDragHoverIndex:(NSInteger)hoverIndex;
+- (void)setDragHoverIndex:(NSUInteger)hoverIndex;
 @end

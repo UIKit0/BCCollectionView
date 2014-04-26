@@ -6,7 +6,6 @@
 
 @interface BCCollectionView ()
 {
-	BOOL isDragging;
 	BOOL firstDrag;
 }
 
@@ -14,43 +13,104 @@
 
 @implementation BCCollectionView (BCCollectionView_Dragging)
 
+- (NSImage*) imageForCurrentSelectionWithItemRect:(NSRect*)itemRect {
+    
+    // we see if we can get a dragged image from our delegate
+    NSIndexSet *indexes = nil;
+    if ([self selectionIndexes])
+        indexes = [self selectionIndexes];
+    else {
+        NSUInteger index = [layoutManager indexOfItemAtPoint:mouseDownLocation];
+        indexes = [NSIndexSet indexSetWithIndex:index];
+    }
+    NSImage *dragImage;
+    if ([delegate respondsToSelector:@selector(collectionView:dragImageForItemsAtIndexes:)]) {
+        dragImage = [delegate collectionView:self dragImageForItemsAtIndexes:indexes];
+        NSUInteger index = [layoutManager indexOfItemAtPoint:mouseDownLocation];
+        *itemRect     = [layoutManager rectOfItemAtIndex:index];
+    } else {
+        NSInteger index = [indexes firstIndex];
+        [self selectItemAtIndex:index];
+        
+        *itemRect     = [layoutManager rectOfItemAtIndex:index];
+        NSView *currentView = [[self viewControllerForItemAtIndex:index] view];
+        NSData *imageData   = [currentView dataWithPDFInsideRect:NSMakeRect(0,0,NSWidth(*itemRect),NSHeight(*itemRect))];
+        NSImage *pdfImage   = [[NSImage alloc] initWithData:imageData];
+        NSImage *dragImage  = [[NSImage alloc] initWithSize:[pdfImage size]];
+        
+        if ([dragImage size].width > 0 && [dragImage size].height > 0) {
+            [dragImage lockFocus];
+            [pdfImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:0.5];
+            [dragImage unlockFocus];
+        }
+    }
+    
+    return dragImage;
+}
+
 - (void)initiateDraggingSessionWithEvent:(NSEvent *)anEvent
 {
-  NSUInteger index = [layoutManager indexOfItemAtPoint:mouseDownLocation];
-  [self selectItemAtIndex:index];
-  
-  NSRect itemRect     = [layoutManager rectOfItemAtIndex:index];
-  NSView *currentView = [[self viewControllerForItemAtIndex:index] view];
-  NSData *imageData   = [currentView dataWithPDFInsideRect:NSMakeRect(0,0,NSWidth(itemRect),NSHeight(itemRect))];
-  NSImage *pdfImage   = [[[NSImage alloc] initWithData:imageData] autorelease];
-  NSImage *dragImage  = [[NSImage alloc] initWithSize:[pdfImage size]];
-  
-  if ([dragImage size].width > 0 && [dragImage size].height > 0) {
-    [dragImage lockFocus];
-    [pdfImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:0.5];
-    [dragImage unlockFocus];
-  }
-  
-  NSPasteboard *pasteboard = [NSPasteboard pasteboardWithName:NSDragPboard];
-  [self delegateWriteIndexes:selectionIndexes toPasteboard:pasteboard];
-  [self retain];
-  [self dragImage:[dragImage autorelease]
-               at:NSMakePoint(NSMinX(itemRect), NSMaxY(itemRect))
-           offset:NSMakeSize(0, 0)
-            event:anEvent
-       pasteboard:pasteboard
-           source:self
-        slideBack:YES];
+    // we see if we should drag file promises. 10.6 style.
+    if ([delegate respondsToSelector:@selector(collectionView:dragFilePromisesWithDataType:)]) {
+        NSString *datatype = nil;
+        if ([delegate collectionView:self dragFilePromisesWithDataType:&datatype]) {
+            [self dragPromisedFilesOfTypes:[NSArray arrayWithObject:datatype]
+                                  fromRect:[self frame]
+                                    source:self
+                                 slideBack:YES
+                                     event:anEvent];
+            return;
+        }
+    }
+    
+    // otherwise we begin a normal drag image
+    NSRect itemRect;
+    NSImage *dragImage = [self imageForCurrentSelectionWithItemRect:&itemRect];
+    NSPasteboard *pasteboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+    
+    [self delegateWriteIndexes:selectionIndexes toPasteboard:pasteboard];
+    [super dragImage:dragImage
+                  at:NSMakePoint(NSMinX(itemRect), NSMaxY(itemRect))
+              offset:NSMakeSize(0, 0)
+               event:anEvent
+          pasteboard:pasteboard
+              source:self
+           slideBack:YES];
 }
+
+
+- (void)dragImage:(NSImage *)anImage at:(NSPoint)viewLocation offset:(NSSize)initialOffset
+            event:(NSEvent *)theEvent pasteboard:(NSPasteboard *)pboard source:(id)sourceObj slideBack:(BOOL)slideFlag {
+    
+    NSData *dragData = nil;
+    if ([self.delegate respondsToSelector:@selector(collectionView:dragDataForItemsAtIndexes:)] ) {
+        dragData = [self.delegate collectionView:self dragDataForItemsAtIndexes:[self selectionIndexes]];
+    }
+
+    
+    [pboard addTypes:[NSArray arrayWithObjects:ALBUMIMAGEDATATYPE, NSFilesPromisePboardType, nil] owner:self];
+    [pboard setData:dragData forType:ALBUMIMAGEDATATYPE];
+    
+    
+    NSRect itemRect;
+    NSImage *dragImage = [self imageForCurrentSelectionWithItemRect:&itemRect];
+    
+    [super dragImage:dragImage
+                  at:NSMakePoint(NSMinX(itemRect), NSMaxY(itemRect))
+              offset:NSMakeSize(0, 0)
+               event:theEvent
+          pasteboard:pboard
+              source:self
+           slideBack:YES];
+}
+
 
 - (void)draggedImage:(NSImage *)anImage beganAt:(NSPoint)aPoint
 {
-  [self retain];
 }
 
 - (void)draggedImage:(NSImage *)anImage endedAt:(NSPoint)aPoint operation:(NSDragOperation)operation
 {
-  [self autorelease];
 }
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender
@@ -119,7 +179,7 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
   id item = nil;
-  if (dragHoverIndex >= 0 && dragHoverIndex <[contentArray count])
+  if (dragHoverIndex <[contentArray count])
     item = [contentArray objectAtIndex:dragHoverIndex];
   
   if ([delegate respondsToSelector:@selector(collectionView:performDragOperation:onViewController:forItem:)])
@@ -131,7 +191,7 @@
 #pragma mark -
 #pragma mark Delegate Shortcuts
 
-- (void)setDragHoverIndex:(NSInteger)hoverIndex
+- (void)setDragHoverIndex:(NSUInteger)hoverIndex
 {
   if (hoverIndex != dragHoverIndex) {
     if (dragHoverIndex != NSNotFound)

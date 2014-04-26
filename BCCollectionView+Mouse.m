@@ -8,6 +8,9 @@
 
 @implementation BCCollectionView (BCCollectionView_Mouse)
 
+BOOL isDragging;
+BOOL firstDrag;
+
 - (BOOL)shiftOrCommandKeyPressed
 {
   return [NSEvent modifierFlags] & NSShiftKeyMask || [NSEvent modifierFlags] & NSCommandKeyMask;
@@ -18,20 +21,20 @@
   [[self window] makeFirstResponder:self];
   
   isDragging           = YES;
-  mouseDownLocation    = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+  mouseDownLocation    = BCRoundedPoint([self convertPoint:[theEvent locationInWindow] fromView:nil]);
   mouseDraggedLocation = mouseDownLocation;
   NSUInteger index     = [layoutManager indexOfItemContentRectAtPoint:mouseDownLocation];
   
   if (index != NSNotFound && [delegate respondsToSelector:@selector(collectionView:didClickItem:withViewController:)])
-    [delegate collectionView:self didClickItem:[contentArray objectAtIndex:index] withViewController:[visibleViewControllers objectForKey:[NSNumber numberWithInt:index]]];
-  
+    [delegate collectionView:self didClickItem:[contentArray objectAtIndex:index] withViewController:[visibleViewControllers objectForKey:[NSNumber numberWithUnsignedInteger:index]]];
+
   if (![self shiftOrCommandKeyPressed] && ![selectionIndexes containsIndex:index])
     [self deselectAllItems];
   
-  self.originalSelectionIndexes = [[selectionIndexes copy] autorelease];
+  self.originalSelectionIndexes = [selectionIndexes copy];
   
   if ([theEvent type] == NSLeftMouseDown && [theEvent clickCount] == 2 && [delegate respondsToSelector:@selector(collectionView:didDoubleClickViewControllerAtIndex:)])
-    [delegate collectionView:self didDoubleClickViewControllerAtIndex:[visibleViewControllers objectForKey:[NSNumber numberWithInt:index]]];
+    [delegate collectionView:self didDoubleClickViewControllerAtIndex:[visibleViewControllers objectForKey:[NSNumber numberWithUnsignedInteger:index]]];
   
   if ([self shiftOrCommandKeyPressed] && [self.originalSelectionIndexes containsIndex:index])
     [self deselectItemAtIndex:index];
@@ -66,11 +69,11 @@
   }
   [self setNeedsDisplayInRect:BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation)];
   
-  mouseDraggedLocation = [self convertPoint:[anEvent locationInWindow] fromView:nil];
+  mouseDraggedLocation = BCRoundedPoint([self convertPoint:[anEvent locationInWindow] fromView:nil]);
   NSIndexSet *suggestedIndexes = [self indexesOfItemContentRectsInRect:BCRectFromTwoPoints(mouseDownLocation, mouseDraggedLocation)];
   
   if (![self shiftOrCommandKeyPressed]) {
-    NSMutableIndexSet *oldIndexes = [[selectionIndexes mutableCopy] autorelease];
+    NSMutableIndexSet *oldIndexes = [selectionIndexes mutableCopy];
     [oldIndexes removeIndexes:suggestedIndexes];
     [self deselectItemsAtIndexes:oldIndexes];
   }

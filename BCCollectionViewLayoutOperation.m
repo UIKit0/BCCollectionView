@@ -15,7 +15,7 @@
   if ([self isCancelled])
     return;
   
-  NSInteger numberOfRows = 0;
+  NSUInteger numberOfRows = 0;
   NSInteger startingX = 0;
   NSInteger x = 0;
   NSInteger y = 0;
@@ -24,7 +24,12 @@
   NSSize cellSize       = [collectionView cellSize];
   NSSize inset          = NSZeroSize;
   NSInteger maxColumns  = [[collectionView layoutManager] maximumNumberOfItemsPerRow];
-  NSUInteger gap        = (NSWidth([collectionView frame]) - maxColumns*cellSize.width)/(maxColumns-1);
+  NSUInteger gap        = 0;
+	
+  if (maxColumns == 1)
+    gap = NSWidth([collectionView frame]) - cellSize.width;
+  else
+    gap = (NSWidth([collectionView frame]) - maxColumns*cellSize.width)/(maxColumns-1);
   if (maxColumns < 4 && maxColumns > 1) {
     gap = (NSWidth([collectionView frame]) - maxColumns*cellSize.width)/(maxColumns+1);
     startingX = gap;
@@ -42,7 +47,7 @@
     y += [[collectionView delegate] topOffsetForItemsInCollectionView:collectionView];
   
   NSUInteger count = [[collectionView contentArray] count];
-  for (NSInteger i=0; i<count; i++) {
+  for (NSUInteger i=0; i<count; i++) {
     if ([self isCancelled])
       return;
     
@@ -83,9 +88,7 @@
     if ([group itemRange].location + [group itemRange].length-1 == i)
       group = [groupEnum nextObject];
   }
-  numberOfRows = MAX(numberOfRows, [[collectionView groups] count]);
-  if ([[collectionView contentArray] count] > 0 && numberOfRows == -1)
-    numberOfRows = 1;
+	//numberOfRows = MAX(numberOfRows, [[collectionView groups] count]);
   
   if (![self isCancelled]) {
     dispatch_async(dispatch_get_main_queue(), ^{

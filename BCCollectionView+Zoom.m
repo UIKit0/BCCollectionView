@@ -5,6 +5,10 @@
 #import "BCCollectionViewLayoutManager.h"
 
 @interface BCCollectionView ()
+{
+	CGFloat lastPinchMagnification;
+}
+
 - (void)removeInvisibleViewControllers;
 - (void)addMissingViewControllersToView;
 @end

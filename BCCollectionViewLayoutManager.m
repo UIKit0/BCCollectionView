@@ -52,6 +52,11 @@
   return MAX(1, [collectionView frame].size.width/[self cellSize].width);
 }
 
+- (NSUInteger)numberOfRows
+{
+	return ceil((float)[collectionView.contentArray count] / [self maximumNumberOfItemsPerRow]);
+}
+
 - (NSSize)cellSize
 {
   return [collectionView cellSize];

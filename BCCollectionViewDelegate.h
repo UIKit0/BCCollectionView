@@ -19,7 +19,7 @@ enum {
 - (NSViewController *)reusableViewControllerForCollectionView:(BCCollectionView *)collectionView;
 
 //The CollectionView is about to display the ViewController. Use this method to populate the ViewController with data
-- (void)collectionView:(BCCollectionView *)collectionView willShowViewController:(NSViewController *)viewController forItem:(id)anItem;
+- (void)collectionView:(BCCollectionView *)collectionView willShowViewController:(NSViewController *)viewController forItem:(id)anItem atIndex:(NSUInteger)anIndex;
 
 @optional
 //the viewController has been removed from view and storen for reuse. You can uload any resources here

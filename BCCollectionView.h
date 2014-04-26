@@ -11,7 +11,7 @@
 @class BCCollectionViewLayoutManager;
 @interface BCCollectionView : NSView
 {
-  IBOutlet id<BCCollectionViewDelegate> delegate;
+  IBOutlet __unsafe_unretained id<BCCollectionViewDelegate> delegate;
   BCCollectionViewLayoutManager *layoutManager;
   
   NSArray *contentArray;
@@ -34,16 +34,13 @@
   NSIndexSet *originalSelectionIndexes;
   NSInteger dragHoverIndex;
   
-  BOOL isDragging;
-  BOOL firstDrag;
   BOOL selectionChangedDisabled;
   
   NSString *zoomValueObserverKey;
-  CGFloat lastPinchMagnification;
   
   NSString *accumulatedKeyStrokes;
 }
-@property (nonatomic, assign) id<BCCollectionViewDelegate> delegate;
+@property (nonatomic, assign) __unsafe_unretained id<BCCollectionViewDelegate> delegate;
 @property (nonatomic, retain) NSColor *backgroundColor;
 @property (nonatomic) NSUInteger numberOfPreRenderedRows;
 

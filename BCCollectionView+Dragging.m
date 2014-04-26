@@ -86,11 +86,6 @@
     if ([self.delegate respondsToSelector:@selector(collectionView:dragDataForItemsAtIndexes:)] ) {
         dragData = [self.delegate collectionView:self dragDataForItemsAtIndexes:[self selectionIndexes]];
     }
-
-    
-    [pboard addTypes:[NSArray arrayWithObjects:ALBUMIMAGEDATATYPE, NSFilesPromisePboardType, nil] owner:self];
-    [pboard setData:dragData forType:ALBUMIMAGEDATATYPE];
-    
     
     NSRect itemRect;
     NSImage *dragImage = [self imageForCurrentSelectionWithItemRect:&itemRect];

@@ -61,6 +61,7 @@
 		93DF165E1370703900D6C085 /* CellViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CellViewController.h; sourceTree = "<group>"; };
 		93DF165F1370703900D6C085 /* CellViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CellViewController.m; sourceTree = "<group>"; };
 		93DF16631370708900D6C085 /* CellViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CellViewController.xib; sourceTree = "<group>"; };
+		C020AB11190D0B2E003F7380 /* BCCollectionView+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "BCCollectionView+Private.h"; path = "../BCCollectionView+Private.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +162,7 @@
 			children = (
 				93DF163413706EF300D6C085 /* BCCollectionView.h */,
 				93DF163513706EF300D6C085 /* BCCollectionView.m */,
+				C020AB11190D0B2E003F7380 /* BCCollectionView+Private.h */,
 				93DF163613706EF300D6C085 /* BCCollectionView+Dragging.h */,
 				93DF163713706EF300D6C085 /* BCCollectionView+Dragging.m */,
 				93DF163813706EF300D6C085 /* BCCollectionView+Keyboard.h */,
@@ -296,6 +298,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Example_Prefix.pch;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Example-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = Example;
@@ -311,6 +314,7 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Example_Prefix.pch;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Example-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = Example;

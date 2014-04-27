@@ -1,6 +1,7 @@
 //  Created by Pieter Omvlee on 25/11/2010.
 //  Copyright 2010 Bohemian Coding. All rights reserved.
 
+#import "BCCollectionView+Private.h"
 #import "BCCollectionView+Mouse.h"
 #import "BCGeometryExtensions.h"
 #import "BCCollectionView+Dragging.h"
@@ -92,7 +93,7 @@ BOOL firstDrag;
   
   selectionChangedDisabled = NO;
   if (![selectionIndexes isEqual:originalSet])
-    [self performSelector:@selector(delegateCollectionViewSelectionDidChange)];
+    [self delegateCollectionViewSelectionDidChange];
 }
 
 - (void)mouseDragged:(NSEvent *)anEvent

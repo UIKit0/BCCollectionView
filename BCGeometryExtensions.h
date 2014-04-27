@@ -3,11 +3,12 @@
 
 #import <Foundation/Foundation.h>
 
-static NSPoint BCRoundedPoint(NSPoint a){
-    return NSMakePoint(round(a.x), round(a.y));
+__attribute__ ((unused)) static NSPoint BCRoundedPoint(NSPoint a)
+{
+  return NSMakePoint(round(a.x), round(a.y));
 }
 
-static NSRect BCRectFromTwoPoints(NSPoint a, NSPoint b)
+__attribute__ ((unused)) static NSRect BCRectFromTwoPoints(NSPoint a, NSPoint b)
 {
 	NSRect  r;
 	
